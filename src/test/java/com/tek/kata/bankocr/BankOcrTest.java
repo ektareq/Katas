@@ -44,4 +44,15 @@ public class BankOcrTest {
 		assertEquals("123456789", bankOcr.resolveCode());
 		
 	}
+	
+	@Test
+	void should_have_valid_number() throws Exception {
+		BankOcr bankOcr = new BankOcr(
+				  "    _  _     _  _  _  _  _ \n"
+				+ "  | _| _||_||_ |_   ||_||_|\n"
+				+ "  ||_  _|  | _||_|  ||_| _|\n"
+				+ "                           ");
+		
+		assertTrue(bankOcr.isValid());
+	}
 }

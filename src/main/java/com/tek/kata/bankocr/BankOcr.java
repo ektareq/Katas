@@ -168,4 +168,33 @@ public class BankOcr {
 		}
 	}
 
+	// check if a bank account number is valid
+	// a bank account number is valid when it's checksum mod 11 = 0
+	public boolean isValid() {
+		int checksum = checksum();
+		return checksum % 11 == 0;
+	}
+	
+	/**
+	 *  bank account number:  3  4  5  8  8  2  8  6  5
+		position names:       d9 d8 d7 d6 d5 d4 d3 d2 d1
+		
+		checksum = (d1+2*d2+3*d3+...+9*d9)
+	 *  
+	 * @return checksum
+	 */
+	private int checksum() {
+		int checksum = 0;
+		String stringAccountNumber = resolveCode();
+		int[] digitsArray = stringAccountNumber.chars() 
+			    .map(c -> c - '0')  // from char to digit
+			    .toArray();
+		
+		System.out.println(digitsArray);
+		for (int i = 1; i < digitsArray.length + 1; i++) {
+			checksum=+checksum+digitsArray[digitsArray.length - i]*i;
+		}
+		return checksum;
+	}
+
 }
