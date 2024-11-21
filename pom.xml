@@ -43,9 +43,9 @@
 			<version>2.15.1</version>
 		</dependency>
 		<dependency>
-			<groupId>com.tek</groupId>
-			<artifactId>utility</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>org.zalando</groupId>
+			<artifactId>problem</artifactId>
+			<version>0.27.1</version>
 		</dependency>
 	</dependencies>
 
