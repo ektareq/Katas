@@ -1,5 +1,10 @@
 package com.tek.kata.bankocr;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -39,13 +44,17 @@ public class BankOcr {
 			new CodePoint(24,25,26)
 			);
 
+	public BankOcr(InputStream is) throws IOException {
+		this(new String(is.readAllBytes()));
+	}
+	
 	public BankOcr(String rawCode) {
 		if(rawCode == null || rawCode.isEmpty()) 
 			throw new IllegalStateException("code cannot be blank");
-		String[] lines = rawCode.split("\n");
+		String[] lines = rawCode.split("\r?\n");
 		if(lines.length != LINE_NUMBER)
 			throw new IllegalStateException(String.format("Number of line should be exactly 4 but it is %s", lines.length));
-		int i = 0;
+		int i = 1;
 		for (String line : lines) {
 			if(line.length() != LINE_LENGH) {
 				throw new IllegalStateException(String.format("Each line should have exactly 27 chars but the line number %s have %s chars", i, line.length()));
@@ -59,6 +68,37 @@ public class BankOcr {
 			fillCodePoints(line);
 		}
 	}
+
+	/**
+	 * from ASCII code to int code in string representation 
+	 * 
+	 * @return
+	 */
+	public String resolveCode() {
+		StringBuilder sb = new StringBuilder();
+		for (CodePoint codePoint : codePoints) {
+			sb.append(fromCodePoint(codePoint));
+		}
+		
+		return sb.toString();
+	}
+
+	/**
+	 * Return the account number and its status in a file
+	 * 	status is  emptyString if the account number is valid
+	 * 	"ERR" otherwise
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
+	public Path extractAccountNumbers() throws IOException {
+		String code = resolveCode();
+		String status = isValid() ? "" : "ERR";
+		Path p = Files.createTempFile("result_numbers", ".txt");
+		p.toFile().deleteOnExit();
+		Files.writeString(p, String.format("%s %s", code, status));
+		return p;
+	}
 	
 	// iterate over line and fill codePoints with chars according to their inner indexes
 	// ex : the first codePoint accept the 3 first chars of each line, the second codePoint the 4, 5 and 6 chars ... and so on
@@ -71,16 +111,6 @@ public class BankOcr {
 				}
 			}
 		}
-	}
-
-	// resolve global rawCode
-	public String resolveCode() {
-		StringBuilder sb = new StringBuilder();
-		for (CodePoint codePoint : codePoints) {
-			sb.append(fromCodePoint(codePoint));
-		}
-		
-		return sb.toString();
 	}
 	
 	// return 
